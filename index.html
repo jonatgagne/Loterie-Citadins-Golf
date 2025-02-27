@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loterie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-image: url('https://example.com/golf-background.jpg'); /* Remplacez par l'URL de votre image de golf */
+            background-size: cover;
+            background-position: center;
+            color: #2E8B57; /* Vert foncé */
+        }
+        table {
+            margin: 0 auto;
+            border-collapse: collapse;
+            width: 50%;
+            background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour le tableau */
+        }
+        th, td {
+            border: 1px solid #2E8B57; /* Vert foncé */
+            padding: 8px;
+            color: #2E8B57; /* Vert foncé */
+        }
+        th {
+            background-color: rgba(46, 139, 87, 0.8); /* Vert foncé semi-transparent */
+        }
+        .winner {
+            font-size: 1.5em;
+            color: #FFD700; /* Or */
+            margin-top: 20px;
+        }
+        button {
+            background-color: #006400; /* Vert foncé */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #228B22; /* Vert forêt */
+        }
+    </style>
+</head>
+<body>
+    <h1>Loterie</h1>
+    <button type="button" onclick="drawWinner()">Tirer au sort</button>
+    <div id="winner" class="winner"></div>
+    <form id="lotteryForm">
+        <table>
+            <thead>
+                <tr>
+                    <th>Numéro</th>
+                    <th>Nom</th>
+                </tr>
+            </thead>
+            <tbody id="numberInputs"></tbody>
+        </table>
+    </form>
+
+    <script>
+        // Créer les champs de formulaire pour 100 numéros sous forme de tableau
+        const numberInputs = document.getElementById('numberInputs');
+        for (let i = 1; i <= 100; i++) {
+            const row = document.createElement('tr');
+            const cellNumber = document.createElement('td');
+            cellNumber.innerText = i;
+            const cellInput = document.createElement('td');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = `Nom pour le numéro ${i}`;
+            input.className = 'number-input';
+            input.id = `number${i}`;
+            cellInput.appendChild(input);
+            row.appendChild(cellNumber);
+            row.appendChild(cellInput);
+            numberInputs.appendChild(row);
+        }
+
+        // Fonction pour tirer au sort un numéro gagnant
+        function drawWinner() {
+            const winnerIndex = Math.floor(Math.random() * 100) + 1;
+            const winnerName = document.getElementById(`number${winnerIndex}`).value;
+            document.getElementById('winner').innerText = `Le numéro gagnant est ${winnerIndex} (${winnerName})`;
+        }
+    </script>
+</body>
+</html>
