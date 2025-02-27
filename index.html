@@ -19,8 +19,7 @@
             border-collapse: collapse;
             width: 50%;
             background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour le tableau */
-        }
-        th, td {
+        {
             border: 1px solid #2E8B57; /* Vert foncé */
             padding: 8px;
             color: #2E8B57; /* Vert foncé */
@@ -40,6 +39,7 @@
             border: none;
             cursor: pointer;
             font-size: 1em;
+            margin: 5px;
         }
         button:hover {
             background-color: #228B22; /* Vert forêt */
@@ -49,6 +49,7 @@
 <body>
     <h1>Loterie</h1>
     <button type="button" onclick="drawWinner()">Tirer au sort</button>
+    <button type="button" onclick="resetForm()">Réinitialiser</button>
     <div id="winner" class="winner"></div>
     <form id="lotteryForm">
         <table>
@@ -75,6 +76,10 @@
             input.placeholder = `Nom pour le numéro ${i}`;
             input.className = 'number-input';
             input.id = `number${i}`;
+            input.value = localStorage.getItem(`number${i}`) || ''; // Charger les valeurs depuis le stockage local
+            input.addEventListener('input', () => {
+                localStorage.setItem(`number${i}`, input.value); // Sauvegarder les valeurs dans le stockage local
+            });
             cellInput.appendChild(input);
             row.appendChild(cellNumber);
             row.appendChild(cellInput);
@@ -86,6 +91,15 @@
             const winnerIndex = Math.floor(Math.random() * 100) + 1;
             const winnerName = document.getElementById(`number${winnerIndex}`).value;
             document.getElementById('winner').innerText = `Le numéro gagnant est ${winnerIndex} (${winnerName})`;
+        }
+
+        // Fonction pour réinitialiser le formulaire
+        function resetForm() {
+            for (let i = 1; i <= 100; i++) {
+                document.getElementById(`number${i}`).value = '';
+                localStorage.removeItem(`number${i}`);
+            }
+            document.getElementById('winner').innerText = '';
         }
     </script>
 </body>
