@@ -17,9 +17,10 @@
         table {
             margin: 0 auto;
             border-collapse: collapse;
-            width: 50%;
+            width: 70%;
             background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour le tableau */
-        {
+        }
+        th, td {
             border: 1px solid #2E8B57; /* Vert foncé */
             padding: 8px;
             color: #2E8B57; /* Vert foncé */
@@ -49,7 +50,6 @@
 <body>
     <h1>Loterie</h1>
     <button type="button" onclick="drawWinner()">Tirer au sort</button>
-    <button type="button" onclick="resetForm()">Réinitialiser</button>
     <div id="winner" class="winner"></div>
     <form id="lotteryForm">
         <table>
@@ -57,10 +57,12 @@
                 <tr>
                     <th>Numéro</th>
                     <th>Nom</th>
+                    <th>Référence</th>
                 </tr>
             </thead>
             <tbody id="numberInputs"></tbody>
         </table>
+        <button type="button" onclick="promptPassword()">Réinitialiser</button>
     </form>
 
     <script>
@@ -70,19 +72,33 @@
             const row = document.createElement('tr');
             const cellNumber = document.createElement('td');
             cellNumber.innerText = i;
-            const cellInput = document.createElement('td');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = `Nom pour le numéro ${i}`;
-            input.className = 'number-input';
-            input.id = `number${i}`;
-            input.value = localStorage.getItem(`number${i}`) || ''; // Charger les valeurs depuis le stockage local
-            input.addEventListener('input', () => {
-                localStorage.setItem(`number${i}`, input.value); // Sauvegarder les valeurs dans le stockage local
+            const cellName = document.createElement('td');
+            const inputName = document.createElement('input');
+            inputName.type = 'text';
+            inputName.placeholder = `Nom pour le numéro ${i}`;
+            inputName.className = 'number-input';
+            inputName.id = `number${i}`;
+            inputName.value = localStorage.getItem(`number${i}`) || ''; // Charger les valeurs depuis le stockage local
+            inputName.addEventListener('input', () => {
+                localStorage.setItem(`number${i}`, inputName.value); // Sauvegarder les valeurs dans le stockage local
             });
-            cellInput.appendChild(input);
+            cellName.appendChild(inputName);
+
+            const cellReference = document.createElement('td');
+            const inputReference = document.createElement('input');
+            inputReference.type = 'text';
+            inputReference.placeholder = `Référence pour le numéro ${i}`;
+            inputReference.className = 'reference-input';
+            inputReference.id = `reference${i}`;
+            inputReference.value = localStorage.getItem(`reference${i}`) || ''; // Charger les valeurs depuis le stockage local
+            inputReference.addEventListener('input', () => {
+                localStorage.setItem(`reference${i}`, inputReference.value); // Sauvegarder les valeurs dans le stockage local
+            });
+            cellReference.appendChild(inputReference);
+
             row.appendChild(cellNumber);
-            row.appendChild(cellInput);
+            row.appendChild(cellName);
+            row.appendChild(cellReference);
             numberInputs.appendChild(row);
         }
 
@@ -93,11 +109,23 @@
             document.getElementById('winner').innerText = `Le numéro gagnant est ${winnerIndex} (${winnerName})`;
         }
 
+        // Fonction pour demander le mot de passe avant de réinitialiser le formulaire
+        function promptPassword() {
+            const password = prompt("Veuillez entrer le mot de passe pour réinitialiser:");
+            if (password === "admin") {
+                resetForm();
+            } else {
+                alert("Mot de passe incorrect.");
+            }
+        }
+
         // Fonction pour réinitialiser le formulaire
         function resetForm() {
             for (let i = 1; i <= 100; i++) {
                 document.getElementById(`number${i}`).value = '';
+                document.getElementById(`reference${i}`).value = '';
                 localStorage.removeItem(`number${i}`);
+                localStorage.removeItem(`reference${i}`);
             }
             document.getElementById('winner').innerText = '';
         }
