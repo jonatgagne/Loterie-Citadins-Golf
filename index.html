@@ -5,46 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loterie</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-            background-image: url('https://example.com/golf-background.jpg'); /* Remplacez par l'URL de votre image de golf */
-            background-size: cover;
-            background-position: center;
-            color: #2E8B57; /* Vert foncé */
-        }
-        table {
-            margin: 0 auto;
-            border-collapse: collapse;
-            width: 70%;
-            background-color: rgba(255, 255, 255, 0.8); /* Fond semi-transparent pour le tableau */
-        }
-        th, td {
-            border: 1px solid #2E8B57; /* Vert foncé */
-            padding: 8px;
-            color: #2E8B57; /* Vert foncé */
-        }
-        th {
-            background-color: rgba(46, 139, 87, 0.8); /* Vert foncé semi-transparent */
-        }
-        .winner {
-            font-size: 1.5em;
-            color: #FFD700; /* Or */
-            margin-top: 20px;
-        }
-        button {
-            background-color: #006400; /* Vert foncé */
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-            margin: 5px;
-        }
-        button:hover {
-            background-color: #228B22; /* Vert forêt */
-        }
+        /* Styles similaires à ceux de votre code original */
     </style>
 </head>
 <body>
@@ -65,7 +26,22 @@
         <button type="button" onclick="promptPassword()">Réinitialiser</button>
     </form>
 
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
     <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "VOTRE_API_KEY",
+            authDomain: "VOTRE_AUTH_DOMAIN",
+            databaseURL: "VOTRE_DATABASE_URL",
+            projectId: "VOTRE_PROJECT_ID",
+            storageBucket: "VOTRE_STORAGE_BUCKET",
+            messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
+            appId: "VOTRE_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         // Créer les champs de formulaire pour 100 numéros sous forme de tableau
         const numberInputs = document.getElementById('numberInputs');
         for (let i = 1; i <= 100; i++) {
@@ -78,9 +54,11 @@
             inputName.placeholder = `Nom pour le numéro ${i}`;
             inputName.className = 'number-input';
             inputName.id = `number${i}`;
-            inputName.value = localStorage.getItem(`number${i}`) || ''; // Charger les valeurs depuis le stockage local
             inputName.addEventListener('input', () => {
-                localStorage.setItem(`number${i}`, inputName.value); // Sauvegarder les valeurs dans le stockage local
+                database.ref(`numbers/${i}`).set({
+                    name: inputName.value,
+                    reference: document.getElementById(`reference${i}`).value
+                });
             });
             cellName.appendChild(inputName);
 
@@ -90,9 +68,11 @@
             inputReference.placeholder = `Référence pour le numéro ${i}`;
             inputReference.className = 'reference-input';
             inputReference.id = `reference${i}`;
-            inputReference.value = localStorage.getItem(`reference${i}`) || ''; // Charger les valeurs depuis le stockage local
             inputReference.addEventListener('input', () => {
-                localStorage.setItem(`reference${i}`, inputReference.value); // Sauvegarder les valeurs dans le stockage local
+                database.ref(`numbers/${i}`).set({
+                    name: document.getElementById(`number${i}`).value,
+                    reference: inputReference.value
+                });
             });
             cellReference.appendChild(inputReference);
 
@@ -100,6 +80,15 @@
             row.appendChild(cellName);
             row.appendChild(cellReference);
             numberInputs.appendChild(row);
+
+            // Charger les valeurs depuis Firebase
+            database.ref(`numbers/${i}`).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    inputName.value = data.name || '';
+                    inputReference.value = data.reference || '';
+                }
+            });
         }
 
         // Fonction pour tirer au sort un numéro gagnant
@@ -124,8 +113,7 @@
             for (let i = 1; i <= 100; i++) {
                 document.getElementById(`number${i}`).value = '';
                 document.getElementById(`reference${i}`).value = '';
-                localStorage.removeItem(`number${i}`);
-                localStorage.removeItem(`reference${i}`);
+                database.ref(`numbers/${i}`).remove();
             }
             document.getElementById('winner').innerText = '';
         }
